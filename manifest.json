@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "getech-orgchart-app-001",
+  "packageName": "com.getech.orgchart",
+  "developer": {
+    "name": "GETech",
+    "websiteUrl": "https://getech.com.sg",
+    "privacyUrl": "https://getech.com.sg",
+    "termsOfUseUrl": "https://getech.com.sg"
+  },
+  "name": {
+    "short": "조직도",
+    "full": "GETech 조직도"
+  },
+  "description": {
+    "short": "GETech 임직원 조직도",
+    "full": "GETech 전체 임직원의 부서, 직급, 연락처를 한눈에 확인할 수 있는 조직도 앱입니다."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#534AB7",
+  "staticTabs": [
+    {
+      "entityId": "orgchart",
+      "name": "조직도",
+      "contentUrl": "REPLACE_WITH_YOUR_URL/index.html",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["github.io"]
+}
