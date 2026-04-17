@@ -27,7 +27,7 @@
     {
       "entityId": "orgchart",
       "name": "조직도",
-      "contentUrl": "REPLACE_WITH_YOUR_URL/index.html",
+      "contentUrl": "https://ijinyoung77-hue.github.io/getech-orgchart.html",
       "scopes": ["personal"]
     }
   ],
