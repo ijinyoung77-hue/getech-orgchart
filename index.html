@@ -21,7 +21,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .main-top h2{font-size:15px;font-weight:500}
 .main-top p{font-size:12px;color:#aaa;margin-top:2px}
 .row-list{display:flex;flex-direction:column;gap:5px}
-.row{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid #eee;border-radius:8px;background:#fff}
+.row{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid #eee;border-radius:8px;background:#fff;cursor:pointer;position:relative}
 .row:hover{background:#f9f8ff}
 .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
 .name{font-size:13px;font-weight:500;min-width:65px}
@@ -33,6 +33,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
 .loading{padding:40px;text-align:center;color:#aaa;font-size:13px}
 .error{padding:40px;text-align:center;color:#e24b4a;font-size:13px}
+
+/* 프로필 카드 */
+.profile-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;background:rgba(0,0,0,0.25)}
+.profile-overlay.show{display:block}
+.profile-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:12px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.18);overflow:hidden;z-index:101}
+.profile-card-top{background:#534AB7;padding:24px 20px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.profile-card-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;border:3px solid rgba(255,255,255,0.5)}
+.profile-card-name{font-size:16px;font-weight:500;color:white}
+.profile-card-rank{font-size:12px;color:rgba(255,255,255,0.75)}
+.profile-card-dept{font-size:12px;color:rgba(255,255,255,0.75)}
+.profile-card-body{padding:16px 20px}
+.profile-card-status{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.profile-card-status-dot{width:9px;height:9px;border-radius:50%}
+.profile-card-status-txt{font-size:13px;color:#555}
+.profile-card-email{display:flex;align-items:center;gap:8px;font-size:12px;color:#666;margin-bottom:16px}
+.profile-card-actions{display:flex;gap:8px}
+.profile-card-btn{flex:1;padding:8px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#534AB7;font-weight:500;display:flex;align-items:center;justify-content:center;gap:5px}
+.profile-card-btn:hover{background:#f5f3ff}
 </style>
 </head>
 <body>
@@ -64,6 +82,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <p id="deptCount"></p>
     </div>
     <div id="rowList"><div class="loading">불러오는 중...</div></div>
+  </div>
+</div>
+
+<!-- 프로필 카드 -->
+<div class="profile-overlay" id="overlay" onclick="closeCard()">
+  <div class="profile-card" onclick="event.stopPropagation()">
+    <div class="profile-card-top">
+      <div class="profile-card-avatar" id="cardAvatar"></div>
+      <div class="profile-card-name" id="cardName"></div>
+      <div class="profile-card-rank" id="cardRank"></div>
+      <div class="profile-card-dept" id="cardDept"></div>
+    </div>
+    <div class="profile-card-body">
+      <div class="profile-card-status">
+        <div class="profile-card-status-dot" id="cardStatusDot"></div>
+        <span class="profile-card-status-txt" id="cardStatusTxt"></span>
+      </div>
+      <div class="profile-card-email">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+        <span id="cardEmail"></span>
+      </div>
+      <div class="profile-card-actions">
+        <button class="profile-card-btn" id="cardChatBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          채팅
+        </button>
+        <button class="profile-card-btn" id="cardMailBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          메일
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -130,7 +180,7 @@ function renderRows(dept){
     const c = deptColors[m.dept]||["#F1EFE8","#5F5E5A"];
     const st = memberStatus[m.name]||statusPool[0];
     const isSpecial = m.rank !== "프로";
-    return `<div class="row">
+    return `<div class="row" onclick="openCard('${m.name}')">
       <div class="avatar" style="background:${c[0]};color:${c[1]}">${m.name.slice(0,2)}</div>
       <div class="name">${m.name}</div>
       <div class="dept-tag">${m.dept}</div>
@@ -148,6 +198,30 @@ function select(dept){
   active=dept;
   renderSidebar();
   renderRows(dept);
+}
+
+function openCard(name){
+  const m = members.find(x=>x.name===name);
+  if(!m) return;
+  const c = deptColors[m.dept]||["#F1EFE8","#5F5E5A"];
+  const st = memberStatus[m.name]||statusPool[0];
+
+  document.getElementById("cardAvatar").textContent = m.name.slice(0,2);
+  document.getElementById("cardAvatar").style.background = c[0];
+  document.getElementById("cardAvatar").style.color = c[1];
+  document.getElementById("cardName").textContent = m.name;
+  document.getElementById("cardRank").textContent = m.rank;
+  document.getElementById("cardDept").textContent = m.dept;
+  document.getElementById("cardStatusDot").style.background = st.color;
+  document.getElementById("cardStatusTxt").textContent = st.label;
+  document.getElementById("cardEmail").textContent = m.email;
+  document.getElementById("cardChatBtn").onclick = () => window.open(`https://teams.microsoft.com/l/chat/0/0?users=${m.email}`);
+  document.getElementById("cardMailBtn").onclick = () => window.open(`mailto:${m.email}`);
+  document.getElementById("overlay").classList.add("show");
+}
+
+function closeCard(){
+  document.getElementById("overlay").classList.remove("show");
 }
 </script>
 </body>
